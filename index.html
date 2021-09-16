@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/vue.js"></script>
+    <title>腳本轉換器</title>
+</head>
+
+<body>
+    <div id="app">
+        <textarea v-model="raw" name="" id="raw" cols="80" rows="20"></textarea>
+        <button v-on:click="copy('')">複製</button>
+        <div id="result">
+            <div v-for="obj in arr" :class="obj.author">
+                <span v-for="content in obj.content.split('nuuu')">{{content}}<br v-if=""></span>
+            </div>
+        </div>
+    </div>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    raw: ''
+                }
+            },
+            computed: {
+                arr() {
+                    const array = this.raw === '' ? [] : JSON.parse(
+                        `[${this.raw.replaceAll('"', '＂').replaceAll(':', '：').replace(/(0[0-9]|1[0-9]|2[0-3])：[0-5][0-9] /g, '"},{"author": "').replaceAll('\n', 'nuuu').replaceAll('Leon Shih ', 'leon", "content": "').replaceAll('Rex Yu ', 'rex", "content": "').substring(3)}"}]`
+                    );
+                    console.log(array);
+                    for (var index = 0; index < array.length; index++) {
+                        if (index > 0) {
+                            if (array[index - 1].author == array[index].author) {
+                                array[index - 1].content += array[index].content
+                                array.splice(index, 1);
+                                if (array[index - 1].author == array[index]?.author)
+                                    index -= 2;
+                            }
+                        }
+                    }
+                    console.log(array);
+                    return array
+                }
+            },
+            methods: {
+                copy: function(){
+                    range = document.createRange();
+                    range.selectNodeContents(document.getElementById('result'));
+                    sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    document.execCommand("copy");
+                    alert("Text has been copied")
+                }
+            }
+        });
+
+    </script>
+    <style>
+        .leon {
+            color: orange
+        }
+    </style>
+</body>
+
+</html>
